@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Jokes & Quotes - Fun Extension",
+  "version": "0.1.0",
+  "description": "Show random jokes, motivational quotes and memes in a popup.",
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Jokes & Quotes"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [],
+  "icons": {}
+}

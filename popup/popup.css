@@ -1,0 +1,15 @@
+:root{
+  --bg: #ffffff;
+  --accent: #4a90e2;
+  --text: #222;
+}
+body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:12px;background:var(--bg);color:var(--text);width:320px}
+.container{display:flex;flex-direction:column;gap:10px}
+h1{font-size:16px;margin:0}
+.controls{display:flex;gap:6px}
+.controls button{flex:1;padding:8px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer}
+.display{min-height:80px;padding:8px;border-radius:6px;background:#f6f6f6}
+.meme-wrap{text-align:center}
+.meme-wrap img{max-width:100%;height:auto;border-radius:6px}
+.actions{display:flex;gap:6px}
+.actions button{flex:1;padding:8px;border-radius:4px;border:1px solid #ddd;background:#fff;cursor:pointer}
