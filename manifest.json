@@ -10,7 +10,13 @@
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "scripting", "activeTab"],
   "host_permissions": [],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/lottie.min.js", "assets/memes/*", "data/*.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {}
 }
