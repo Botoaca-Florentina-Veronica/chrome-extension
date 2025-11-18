@@ -20,6 +20,10 @@ h1{font-size:16px;margin:0}
 .support-btn{display:inline-block;padding:6px 10px;background:#ffdd57;color:#222;border-radius:6px;text-decoration:none;font-weight:600;border:1px solid rgba(0,0,0,0.08)}
 .support-btn:hover{filter:brightness(0.98)}
 
+/* auto-play controls */
+.auto-play{margin:10px 0;background:#f8f8f8;padding:8px;border-radius:6px;border:1px solid #eee}
+.auto-controls{display:flex;align-items:center;margin-top:6px}
+
 /* temporary visible message in popup */
 .toast{
   position:relative;

@@ -39,7 +39,7 @@ Files and purpose
 - `src/background.js`: Background service worker (basic placeholder).
 - `src/content.js`: Content script placeholder (not required for popup-only functionality).
 - `data/*.json`: Local data files with example jokes, quotes and meme filenames.
-- `assets/memes/*`: Local meme images (SVG/PNG) used by the popup.
+- `assets/*`: Local media (SVG/PNG/JSON) used by the popup.
 
 ## 🚀 How to Install
 
@@ -133,7 +133,7 @@ Works perfectly on:
 ]
 ```
 
-**Memes** - Add images to `assets/memes/` and update `data/memes.json`:
+**Memes** - Add images to `assets/` and update `data/memes.json`:
 ```json
 [
   "meme1.svg",

@@ -10,13 +10,27 @@
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage", "scripting", "activeTab"],
+  "permissions": ["storage", "scripting", "activeTab", "alarms"],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["src/lottie.min.js", "assets/memes/*", "data/*.json"],
+      "resources": ["src/lottie.min.js", "assets/*", "data/*.json"],
       "matches": ["<all_urls>"]
     }
   ],
-  "icons": {}
+  "icons": {
+    "16": "assets/laugh (1).png",
+    "32": "assets/laugh (1).png",
+    "48": "assets/laugh (1).png",
+    "128": "assets/laugh (1).png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Jokes & Quotes",
+    "default_icon": {
+      "16": "assets/laugh (1).png",
+      "32": "assets/laugh (1).png",
+      "48": "assets/laugh (1).png"
+    }
+  }
 }

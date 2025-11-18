@@ -16,13 +16,25 @@
       </div>
 
       <div id="display" class="display"></div>
+      <div class="auto-play">
+        <label for="auto-enable"><input type="checkbox" id="auto-enable"> Enable auto animation</label>
+        <div class="auto-controls">
+          <label for="auto-interval">Interval (minutes): </label>
+          <input id="auto-interval" type="number" min="1" value="10" style="width:64px;margin-left:6px" />
+          <label style="margin-left:12px;">Content:</label>
+          <select id="auto-type" style="margin-left:6px">
+            <option value="quote">Quote</option>
+            <option value="joke">Joke</option>
+          </select>
+        </div>
+      </div>
       <div id="meme-wrap" class="meme-wrap" hidden>
         <img id="meme-img" alt="meme" />
       </div>
 
 
       <div class="support">
-        <a id="btn-support" class="support-btn" href="https://www.buymeacoffee.com/yourname" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        <a id="btn-support" class="support-btn" href="https://www.buymeacoffee.com/veraflorenx" target="_blank" rel="noopener">☕ Buy me a coffee</a>
       </div>
 
       <div class="actions">
