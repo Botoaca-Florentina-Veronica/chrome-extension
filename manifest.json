@@ -11,7 +11,7 @@
     "service_worker": "src/background.js"
   },
   "permissions": ["storage", "scripting", "activeTab"],
-  "host_permissions": [],
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
       "resources": ["src/lottie.min.js", "assets/memes/*", "data/*.json"],

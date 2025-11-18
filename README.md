@@ -1,8 +1,17 @@
 # Chrome Extension: Jokes, Quotes & Memes
 
-This repository contains a small Chrome extension which can show random jokes, funny memes and motivational quotes.
+A fun Chrome extension that displays random jokes, motivational quotes, and memes. Features an animated camel that walks across your screen pulling a quote banner!
 
-Project structure
+## ✨ Features
+
+- 🎭 **Random Jokes** - Display funny jokes in the popup
+- 💭 **Motivational Quotes** - 76+ inspiring quotes
+- 🖼️ **Memes** - Show random meme images
+- 🐫 **Animated Screen Overlay** - Click "Play on screen" to see an animated camel walk across any webpage, pulling a quote banner
+- 🎨 **Background Blur Effect** - Page blurs during the animation for better visibility
+- 📋 **Copy to Clipboard** - Easy copy function for jokes and quotes
+
+## 📁 Project Structure
 
 chrome-extension/
 - manifest.json
@@ -32,16 +41,120 @@ Files and purpose
 - `data/*.json`: Local data files with example jokes, quotes and meme filenames.
 - `assets/memes/*`: Local meme images (SVG/PNG) used by the popup.
 
-How to load the extension (developer mode)
+## 🚀 How to Install
 
-1. Open Chrome and go to `chrome://extensions/`.
-2. Enable **Developer mode** (top-right).
-3. Click **Load unpacked** and choose this repository's root folder.
+### Method 1: Load Unpacked (Developer Mode)
 
-Next steps
+1. **Download or Clone** this repository
+2. Open Chrome/Edge and navigate to `chrome://extensions/`
+3. Enable **Developer mode** (toggle in top-right corner)
+4. Click **Load unpacked**
+5. Select the `chrome-extension` folder
+6. The extension icon should appear in your toolbar!
 
-- Replace the sample content in `data/*.json` with your own jokes, quotes and meme images.
-- Improve UI/UX in `popup/popup.html` and `popup/popup.css`.
-- Add sync or remote fetching of content if needed.
+### Method 2: After Installation
 
-If you want, I can now scaffold the folders and create the sample files (manifest, popup UI, scripts, data and a sample meme). Say "Yes, scaffold files" or ask for changes to the structure.
+- Click the extension icon to open the popup
+- Use the buttons: **Joke**, **Quote**, **Meme**, or **Play on screen**
+- Click **Next** to see another random item
+- Click **Copy** to copy jokes/quotes to clipboard
+
+## 🎬 Using the Animation Feature
+
+1. Open **any regular website** (e.g., google.com, youtube.com, wikipedia.org)
+2. Click the extension icon
+3. Click **"Play on screen"** button
+4. Watch the animated camel walk across your screen with a motivational quote!
+
+### ⚠️ Where Animation CANNOT Work
+
+The animation **will not work** on these protected pages:
+- ❌ `chrome://` pages (browser settings, extensions, etc.)
+- ❌ Chrome Web Store (`chrome.google.com/webstore`)
+- ❌ Edge Add-ons store
+- ❌ PDF viewer pages
+- ❌ `file://` local files
+
+**Error message:** `"The extensions gallery cannot be scripted"`
+
+**Solution:** Simply open any normal website (http:// or https://) and try again!
+
+### ✅ Recommended Test Sites
+
+Works perfectly on:
+- ✅ google.com
+- ✅ youtube.com
+- ✅ wikipedia.org
+- ✅ stackoverflow.com
+- ✅ reddit.com
+- ✅ Most news sites and blogs
+
+## 🐛 Troubleshooting
+
+### Animation doesn't appear?
+
+1. **Check the page type**: Make sure you're on a regular website (http/https)
+2. **Open browser console** (F12 → Console tab)
+3. Look for messages starting with `[Chrome Extension]`
+4. **Refresh the page** (F5) and try again
+5. **Reload the extension** at `chrome://extensions`
+
+### Common Error Messages
+
+| Error | Meaning | Solution |
+|-------|---------|----------|
+| "extensions gallery cannot be scripted" | You're on Chrome Web Store | Open any regular website |
+| "Cannot access chrome://" | Browser internal page | Navigate to a normal website |
+| "Failed to load Lottie library" | CSP blocking scripts | Try a different website |
+
+### Still having issues?
+
+- Check browser console (F12) for detailed error logs
+- Make sure extension has permission for "all sites"
+- Test on `wikipedia.org` as a simple test case
+
+## 🔧 Customization
+
+### Add Your Own Content
+
+**Jokes** - Edit `data/jokes.json`:
+```json
+[
+  "Why did the chicken cross the road? To get to the other side!",
+  "Your joke here..."
+]
+```
+
+**Quotes** - Edit `data/quotes.json`:
+```json
+[
+  "Your motivational quote here",
+  "Another inspiring quote..."
+]
+```
+
+**Memes** - Add images to `assets/memes/` and update `data/memes.json`:
+```json
+[
+  "meme1.svg",
+  "your-meme.png"
+]
+```
+
+### Animation Settings
+
+To adjust animation speed, edit `src/popup.js`:
+```javascript
+const durationMs = 18000; // Duration in milliseconds (18s = slower, 8s = faster)
+anim.setSpeed(0.7); // Lottie playback speed (0.5 = slower, 1.0 = normal, 2.0 = faster)
+```
+
+## 🛠️ Technical Details
+
+- **Manifest Version:** V3
+- **Permissions:** storage, scripting, activeTab, `<all_urls>`
+- **Animation Library:** Lottie Web 5.12.2
+- **Injection Method:** Chrome Scripting API (MAIN world)
+- **Content Security Policy:** Respects site CSP restrictions
+
+## 📜 Files Overview
