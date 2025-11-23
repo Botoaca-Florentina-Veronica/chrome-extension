@@ -40,3 +40,10 @@ h1{font-size:16px;margin:0}
   overflow-y:auto;
 }
 .toast-hidden{display:none}
+
+/* visible error panel for actionable diagnostics */
+.error-panel{background:#fff6f6;border:1px solid #ffcccc;padding:10px;border-radius:6px}
+.error-msg{color:#8b0000;font-weight:600;white-space:pre-line}
+.error-details{margin-top:8px;background:#fff; border:1px solid #f0eaea;padding:8px;border-radius:4px;overflow:auto;max-height:140px;font-size:12px}
+.error-actions{display:flex;gap:6px;margin-top:8px}
+.error-actions button{flex:1;padding:8px;border-radius:4px;border:1px solid #ddd;background:#fff;cursor:pointer}

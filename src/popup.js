@@ -11,6 +11,12 @@ const autoInterval = document.getElementById('auto-interval');
 const autoType = document.getElementById('auto-type');
 const memeWrap = document.getElementById('meme-wrap');
 const memeImg = document.getElementById('meme-img');
+const errorPanel = document.getElementById('error-panel');
+const errorMsgEl = document.getElementById('error-msg');
+const errorDetailsEl = document.getElementById('error-details');
+const btnOpenSite = document.getElementById('btn-open-site');
+const btnExtensionDetails = document.getElementById('btn-extension-details');
+const btnEnableFileUrls = document.getElementById('btn-enable-file-urls');
 // animation in popup removed — no popup lottie container
 
 let jokes = [];
@@ -159,8 +165,18 @@ if(btnScreen){
           files: ['src/lottie.min.js', 'src/injector.js']
         }, (res) => {
           if(chrome.runtime.lastError){
-            console.error('[Chrome Extension] Failed to inject library or injector:', chrome.runtime.lastError.message);
-            showPopupMessage('Failed to inject animation library: ' + chrome.runtime.lastError.message, 6000);
+            const msg = chrome.runtime.lastError.message || '';
+            console.error('[Chrome Extension] Failed to inject library or injector:', msg);
+            // Provide clearer user-facing guidance depending on the error
+            if(/extensions gallery cannot be scripted|extensions gallery/i.test(msg)){
+              showErrorPanel('Cannot inject animation on this page: extensions gallery', 'This page (Chrome Web Store or similar) blocks script injection. Open a normal website (https://) and try again.');
+            } else if(/file:|file:\/\//i.test(msg) || /^file:\/\//i.test(msg)){
+              showErrorPanel('Cannot inject into local files', 'Local file URLs (file://) are blocked by default. To allow injection on local files, enable "Allow access to file URLs" for this extension on the Extensions page.');
+            } else if(/Cannot access contents of the page|cannot access/i.test(msg)){
+              showErrorPanel('Page restricts script injection', msg);
+            } else {
+              showErrorPanel('Failed to inject animation library', msg || 'Unknown error while injecting required script files.');
+            }
             return;
           }
 
@@ -182,7 +198,14 @@ if(btnScreen){
             if(chrome.runtime.lastError){
               const errorMsg = chrome.runtime.lastError.message || 'Unknown error';
               console.error('Injection failed:', errorMsg);
-              showPopupMessage('❌ Animation failed to start: ' + errorMsg, 6000);
+              // Try to explain common causes
+              if(/extensions gallery cannot be scripted|extensions gallery/i.test(errorMsg)){
+                showErrorPanel('Animation blocked on this page', 'The extensions gallery (Chrome Web Store) or similar pages cannot be scripted by extensions. Open a normal website and try again.');
+              } else if(/Cannot access|not allowed|blocked/i.test(errorMsg)){
+                showErrorPanel('Injection blocked by the page', errorMsg);
+              } else {
+                showErrorPanel('Animation failed to start', errorMsg);
+              }
             } else {
               console.log('Injection started successfully');
               showPopupMessage('✅ Animation started!', 1500);
@@ -210,22 +233,25 @@ if(btnScreen){
       const isHttp = /^https?:\/\//i.test(url);
       
       if(isRestricted || !isHttp){
-        let msg = '❌ Cannot inject animation on this page.\n\n';
-        
+        // Show actionable error panel with suggestions
+        let shortMsg = 'Cannot inject animation on this page';
+        let details = '';
         if(/^chrome:\/\//i.test(url) || /^edge:\/\//i.test(url)){
-          msg += '🔒 This is a browser internal page.\n';
+          shortMsg = 'Browser internal page';
+          details = 'This is a browser internal page (chrome://, edge://, about:). Extensions cannot inject scripts into these pages.';
         } else if(/webstore|addons/i.test(url)){
-          msg += '🏪 The extensions gallery cannot be scripted.\n';
+          shortMsg = 'Extensions gallery cannot be scripted';
+          details = 'This page (Chrome Web Store or Edge Add-ons) blocks script injection. Open a normal website (https://) and try again.';
         } else if(/^file:\/\//i.test(url)){
-          msg += '📁 Local files are not supported.\n';
+          shortMsg = 'Local files are blocked';
+          details = 'Local file URLs (file://) are disabled by default for script injection. You can enable "Allow access to file URLs" for this extension on the Extensions page.';
         } else {
-          msg += '🚫 This URL type is not supported.\n';
+          shortMsg = 'Unsupported URL type';
+          details = 'This URL type is not supported for script injection. Try opening any http/https website (e.g., https://wikipedia.org) and play the animation there.';
         }
-        
-        msg += '\n✅ Please open a regular website:\n• google.com\n• youtube.com\n• wikipedia.org\n• any http/https website';
-        
+
         console.warn('Cannot inject on restricted page:', url);
-        showPopupMessage(msg, 6000);
+        showErrorPanel(shortMsg, details + '\n\nURL: ' + url);
       } else {
         doInject(active.id);
       }
@@ -253,4 +279,49 @@ function showPopupMessage(text, timeout = 3500){
       }, timeout);
     }
   }catch(e){ console.warn('showPopupMessage error', e); }
+}
+
+// Show a persistent error panel with optional technical details and action buttons
+function showErrorPanel(message, details){
+  try{
+    // hide transient popup message if present
+    const tmp = document.getElementById('popup-msg');
+    if(tmp) tmp.classList.add('toast-hidden');
+
+    if(!errorPanel) return console.warn('Error panel element not found');
+    errorMsgEl.textContent = message || 'Error';
+    if(details){
+      errorDetailsEl.textContent = details;
+      errorDetailsEl.hidden = false;
+    } else {
+      errorDetailsEl.hidden = true;
+    }
+    errorPanel.hidden = false;
+  }catch(e){ console.warn('showErrorPanel failure', e); }
+}
+
+function hideErrorPanel(){
+  try{ if(errorPanel) errorPanel.hidden = true; }catch(e){}
+}
+
+// Error panel action buttons
+if(btnOpenSite){
+  btnOpenSite.addEventListener('click', ()=>{
+    chrome.tabs.create({url:'https://wikipedia.org'});
+  });
+}
+
+if(btnExtensionDetails){
+  btnExtensionDetails.addEventListener('click', ()=>{
+    // Open the Extensions page so user can inspect permissions and allow file URLs
+    try{ chrome.tabs.create({url: 'chrome://extensions/?id=' + chrome.runtime.id}); }catch(e){ try{ chrome.tabs.create({url:'chrome://extensions/'}); }catch(_){}}
+  });
+}
+
+if(btnEnableFileUrls){
+  btnEnableFileUrls.addEventListener('click', ()=>{
+    // Show short instructions in the details area (can't programmatically toggle the setting)
+    const instr = 'To enable access to local files:\n1) Open Extensions (chrome://extensions/)\n2) Find this extension and click "Details"\n3) Enable "Allow access to file URLs"\n\nThen reload the local file page and try again.';
+    showErrorPanel('How to allow access to local files', instr);
+  });
 }
