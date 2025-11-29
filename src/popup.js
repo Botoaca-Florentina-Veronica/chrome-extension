@@ -17,7 +17,8 @@ const errorDetailsEl = document.getElementById('error-details');
 const btnOpenSite = document.getElementById('btn-open-site');
 const btnExtensionDetails = document.getElementById('btn-extension-details');
 const btnEnableFileUrls = document.getElementById('btn-enable-file-urls');
-// animation in popup removed — no popup lottie container
+const autoStatusEl = document.getElementById('auto-status');
+const statusTextEl = document.getElementById('status-text');
 
 let jokes = [];
 let quotes = [];
@@ -94,6 +95,8 @@ loadData().then(()=>{
       try{ autoEnable.checked = !!items.autoEnabled; }catch(e){}
       try{ autoInterval.value = items.autoMinutes || 10; }catch(e){}
       try{ if(autoType) autoType.value = items.autoType || 'quote'; }catch(e){}
+      // show persistent auto status (do not disappear)
+      try{ updateAutoStatus(!!items.autoEnabled, items.autoMinutes || 10); }catch(e){}
     });
   }catch(e){}
 }).catch(err=>{
@@ -111,7 +114,8 @@ if(autoEnable && autoInterval){
     chrome.storage.sync.set({autoEnabled: enabled, autoMinutes: minutes, autoType: type}, ()=>{});
     chrome.runtime.sendMessage({action:'setAlarm', enabled, minutes}, (resp)=>{
       if(chrome.runtime.lastError) console.warn('setAlarm error', chrome.runtime.lastError.message);
-      showPopupMessage(enabled ? ('Auto animation enabled, every ' + minutes + ' min') : 'Auto animation disabled', 2000);
+      // update persistent status above the enable checkbox (green when enabled)
+      updateAutoStatus(enabled, minutes);
     });
   });
 
@@ -123,7 +127,8 @@ if(autoEnable && autoInterval){
     if(enabled){
       chrome.runtime.sendMessage({action:'setAlarm', enabled:true, minutes}, (resp)=>{
         if(chrome.runtime.lastError) console.warn('setAlarm error', chrome.runtime.lastError.message);
-        showPopupMessage('Auto interval updated: ' + minutes + ' min', 2000);
+        // update persistent status text to show new interval without transient toast
+        updateAutoStatus(enabled, minutes);
       });
     }
   });
@@ -324,4 +329,23 @@ if(btnEnableFileUrls){
     const instr = 'To enable access to local files:\n1) Open Extensions (chrome://extensions/)\n2) Find this extension and click "Details"\n3) Enable "Allow access to file URLs"\n\nThen reload the local file page and try again.';
     showErrorPanel('How to allow access to local files', instr);
   });
+}
+
+// Update the persistent auto status area (keeps visible; green when enabled)
+function updateAutoStatus(enabled, minutes){
+  try{
+    if(!autoStatusEl || !statusTextEl) return;
+    const mins = Math.max(1, parseInt(minutes,10) || 10);
+    if(enabled){
+      statusTextEl.textContent = ' — every ' + mins + ' min';
+      autoStatusEl.classList.add('enabled');
+      autoStatusEl.classList.remove('disabled');
+      autoStatusEl.hidden = false;
+    } else {
+      statusTextEl.textContent = ' — disabled';
+      autoStatusEl.classList.add('disabled');
+      autoStatusEl.classList.remove('enabled');
+      autoStatusEl.hidden = false;
+    }
+  }catch(e){ console.warn('updateAutoStatus', e); }
 }

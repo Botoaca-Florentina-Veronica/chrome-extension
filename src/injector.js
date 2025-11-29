@@ -159,6 +159,23 @@
           try{ if(anim && anim.play) anim.play(); }catch(e){}
           try{ if(anim && anim.setSpeed) anim.setSpeed(0.7); }catch(e){}
 
+          // Function to stop the animation immediately
+          function stopAnimation(e){
+            if(e) e.preventDefault(); // Prevent context menu
+            clearInterval(monitorInterval);
+            try{
+              if(anim){ try{ anim.loop = false; }catch(e){} try{ anim.pause(); }catch(e){} try{ if(anim.destroy) anim.destroy(); }catch(e){} }
+            } catch(e){}
+            try{ move.cancel(); }catch(e){} // Cancel the movement animation
+            try{ container.remove(); }catch(e){}
+            try{ removeInteractionBlockers(); }catch(e){}
+            if(blurLayer && blurLayer.parentNode) blurLayer.remove();
+            for(const item of fallbackFiltered){ try{ item.el.style.filter = item.old || ''; }catch(e){} }
+          }
+
+          // Listen for right-click to stop the animation
+          document.addEventListener('contextmenu', stopAnimation, { once: true, capture: true });
+
           const vw = window.innerWidth || document.documentElement.clientWidth;
           const durationMs = 18000;
 

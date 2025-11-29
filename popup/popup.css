@@ -8,6 +8,7 @@ body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:12px;background:
 h1{font-size:16px;margin:0}
 .controls{display:flex;gap:6px}
 .controls button{flex:1;padding:8px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer}
+.hint{display:block;text-align:center;font-size:11px;color:#666;margin:4px 0}
 .display{min-height:80px;padding:8px;border-radius:6px;background:#f6f6f6}
 .meme-wrap{text-align:center}
 .meme-wrap img{max-width:100%;height:auto;border-radius:6px}
@@ -23,6 +24,18 @@ h1{font-size:16px;margin:0}
 /* auto-play controls */
 .auto-play{margin:10px 0;background:#f8f8f8;padding:8px;border-radius:6px;border:1px solid #eee}
 .auto-controls{display:flex;align-items:center;margin-top:6px}
+
+/* persistent status integrated with enable button */
+.auto-status{
+  padding:8px 10px;
+  border-radius:6px;
+  font-size:12px;
+  text-align:left;
+  display:block;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06);
+}
+.auto-status.enabled{background:#e6ffed;color:#09502a;border:1px solid #b7f0c9}
+.auto-status.disabled{background:#f2f2f2;color:#444;border:1px solid #e6e6e6}
 
 /* temporary visible message in popup */
 .toast{

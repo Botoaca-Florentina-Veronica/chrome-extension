@@ -14,10 +14,14 @@
         <button id="btn-quote">Quote</button>
         <button id="btn-screen">Play on screen</button>
       </div>
+      <small class="hint">Right-click anywhere to stop animation while playing</small>
 
       <div id="display" class="display"></div>
       <div class="auto-play">
-        <label for="auto-enable"><input type="checkbox" id="auto-enable"> Enable auto animation</label>
+        <div id="auto-status" class="auto-status" hidden>
+          <label for="auto-enable"><input type="checkbox" id="auto-enable"> Enable auto animation</label>
+          <span id="status-text" class="status-text"></span>
+        </div>
         <div class="auto-controls">
           <label for="auto-interval">Interval (minutes): </label>
           <input id="auto-interval" type="number" min="1" value="10" style="width:64px;margin-left:6px" />
