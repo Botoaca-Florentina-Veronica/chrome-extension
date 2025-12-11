@@ -25,24 +25,122 @@ let quotes = [];
 let memes = [];
 let currentType = 'joke';
 let currentItem = null;
+let quotesQueue = []; // holds remaining indexes in current shuffle cycle
+let jokesQueue = []; // holds remaining indexes for jokes
 
 function rand(arr){
   if(!arr || arr.length===0) return null;
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
+function shuffleArray(a){
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+}
+
+function saveQuoteQueue(){
+  try{ chrome.storage.local.set({quotesQueue}); }catch(e){ console.warn('saveQuoteQueue', e); }
+}
+
+function saveJokeQueue(){
+  try{ chrome.storage.local.set({jokesQueue}); }catch(e){ console.warn('saveJokeQueue', e); }
+}
+
+function initQuoteQueue(){
+  return new Promise((resolve)=>{
+    try{
+      chrome.storage.local.get(['quotesQueue'], (res)=>{
+        try{
+          const stored = res && res.quotesQueue;
+          if(Array.isArray(stored) && stored.length === quotes.length && quotes.length>0){
+            quotesQueue = stored.slice();
+          } else {
+            quotesQueue = Array.from({length: quotes.length}, (_,i) => i);
+            shuffleArray(quotesQueue);
+            saveQuoteQueue();
+          }
+        }catch(e){
+          quotesQueue = Array.from({length: quotes.length}, (_,i) => i);
+          shuffleArray(quotesQueue);
+          saveQuoteQueue();
+        }
+        resolve();
+      });
+    }catch(e){
+      // fallback: create a fresh queue
+      quotesQueue = Array.from({length: quotes.length}, (_,i) => i);
+      shuffleArray(quotesQueue);
+      resolve();
+    }
+  });
+}
+
+function initJokeQueue(){
+  return new Promise((resolve)=>{
+    try{
+      chrome.storage.local.get(['jokesQueue'], (res)=>{
+        try{
+          const stored = res && res.jokesQueue;
+          if(Array.isArray(stored) && stored.length === jokes.length && jokes.length>0){
+            jokesQueue = stored.slice();
+          } else {
+            jokesQueue = Array.from({length: jokes.length}, (_,i) => i);
+            shuffleArray(jokesQueue);
+            saveJokeQueue();
+          }
+        }catch(e){
+          jokesQueue = Array.from({length: jokes.length}, (_,i) => i);
+          shuffleArray(jokesQueue);
+          saveJokeQueue();
+        }
+        resolve();
+      });
+    }catch(e){
+      jokesQueue = Array.from({length: jokes.length}, (_,i) => i);
+      shuffleArray(jokesQueue);
+      resolve();
+    }
+  });
+}
+
+function getNextQuote(){
+  if(!quotes || quotes.length===0) return null;
+  if(!Array.isArray(quotesQueue) || quotesQueue.length === 0){
+    quotesQueue = Array.from({length: quotes.length}, (_,i) => i);
+    shuffleArray(quotesQueue);
+  }
+  const idx = quotesQueue.shift();
+  saveQuoteQueue();
+  return quotes[idx] || null;
+}
+
+function getNextJoke(){
+  if(!jokes || jokes.length===0) return null;
+  if(!Array.isArray(jokesQueue) || jokesQueue.length === 0){
+    jokesQueue = Array.from({length: jokes.length}, (_,i) => i);
+    shuffleArray(jokesQueue);
+  }
+  const idx = jokesQueue.shift();
+  saveJokeQueue();
+  return jokes[idx] || null;
+}
+
 async function loadData(){
   const jResp = await fetch(chrome.runtime.getURL('data/jokes.json'));
   jokes = await jResp.json();
+  try{ await initJokeQueue(); }catch(e){ console.warn('initJokeQueue failed', e); }
   const qResp = await fetch(chrome.runtime.getURL('data/quotes.json'));
   quotes = await qResp.json();
+  try{ await initQuoteQueue(); }catch(e){ console.warn('initQuoteQueue failed', e); }
   const mResp = await fetch(chrome.runtime.getURL('data/memes.json'));
   memes = await mResp.json();
 }
 
 function showJoke(){
   memeWrap.hidden = true;
-  const j = rand(jokes);
+  const j = getNextJoke();
   currentType = 'joke';
   currentItem = j;
   display.textContent = j || 'No jokes available.';
@@ -50,7 +148,7 @@ function showJoke(){
 
 function showQuote(){
   memeWrap.hidden = true;
-  const q = rand(quotes);
+  const q = getNextQuote();
   currentType = 'quote';
   currentItem = q;
   display.textContent = q || 'No quotes available.';
@@ -158,9 +256,9 @@ if(btnScreen){
         const chosenType = (autoType && autoType.value) ? autoType.value : 'quote';
         let randomQuote = 'Keep going!';
         if(chosenType === 'joke'){
-          if(jokes && jokes.length>0) randomQuote = jokes[Math.floor(Math.random()*jokes.length)];
+          if(jokes && jokes.length>0) randomQuote = getNextJoke() || jokes[Math.floor(Math.random()*jokes.length)];
         } else {
-          if(quotes && quotes.length>0) randomQuote = quotes[Math.floor(Math.random()*quotes.length)];
+          if(quotes && quotes.length>0) randomQuote = getNextQuote() || quotes[Math.floor(Math.random()*quotes.length)];
         }
         
         // Inject Lottie and the shared injector, then call the injector starter
